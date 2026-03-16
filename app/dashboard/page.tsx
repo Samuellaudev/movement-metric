@@ -1,96 +1,51 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { db } from "@/db";
-import { workouts, workoutExercises, exercises, sets } from "@/db/schema";
-import { eq, and, gte, lt } from "drizzle-orm";
+"use client";
+
+import { useState } from "react";
+import { format } from "date-fns";
 import DatePicker from "./date-picker";
 
-type SearchParams = Promise<{ date?: string }>;
+const MOCK_WORKOUTS = [
+  {
+    id: 1,
+    name: "Morning Push Session",
+    startedAt: new Date(2026, 2, 16, 7, 30),
+    finishedAt: new Date(2026, 2, 16, 8, 45),
+    exercises: [
+      {
+        id: 1,
+        name: "Bench Press",
+        sets: [
+          { id: 1, setNumber: 1, reps: 8, weightKg: "80" },
+          { id: 2, setNumber: 2, reps: 8, weightKg: "82.5" },
+          { id: 3, setNumber: 3, reps: 6, weightKg: "85" },
+        ],
+      },
+      {
+        id: 2,
+        name: "Overhead Press",
+        sets: [
+          { id: 4, setNumber: 1, reps: 10, weightKg: "50" },
+          { id: 5, setNumber: 2, reps: 10, weightKg: "50" },
+          { id: 6, setNumber: 3, reps: 8, weightKg: "52.5" },
+        ],
+      },
+      {
+        id: 3,
+        name: "Tricep Pushdown",
+        sets: [
+          { id: 7, setNumber: 1, reps: 12, weightKg: "30" },
+          { id: 8, setNumber: 2, reps: 12, weightKg: "30" },
+        ],
+      },
+    ],
+  },
+];
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+export default function DashboardPage() {
+  const [date, setDate] = useState(new Date(2026, 2, 16));
 
-  const { date } = await searchParams;
-  const dateStr = date ?? new Date().toISOString().split("T")[0];
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
-  const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
-
-  const rows = await db
-    .select()
-    .from(workouts)
-    .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
-    .leftJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
-    .leftJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
-    .where(
-      and(
-        eq(workouts.userId, userId),
-        gte(workouts.startedAt, startOfDay),
-        lt(workouts.startedAt, endOfDay)
-      )
-    )
-    .orderBy(workouts.id, workoutExercises.order, sets.setNumber);
-
-  // Aggregate flat rows into nested workout → exercises → sets
-  type ExerciseEntry = {
-    id: number;
-    order: number;
-    name: string;
-    sets: { id: number; setNumber: number; reps: number | null; weightKg: string | null }[];
-  };
-  type WorkoutEntry = {
-    id: number;
-    name: string | null;
-    startedAt: Date | null;
-    finishedAt: Date | null;
-    exercises: Map<number, ExerciseEntry>;
-  };
-
-  const workoutsMap = new Map<number, WorkoutEntry>();
-
-  for (const row of rows) {
-    if (!workoutsMap.has(row.workouts.id)) {
-      workoutsMap.set(row.workouts.id, {
-        id: row.workouts.id,
-        name: row.workouts.name,
-        startedAt: row.workouts.startedAt,
-        finishedAt: row.workouts.finishedAt,
-        exercises: new Map(),
-      });
-    }
-
-    const workout = workoutsMap.get(row.workouts.id)!;
-
-    if (row.workout_exercises) {
-      const weId = row.workout_exercises.id;
-      if (!workout.exercises.has(weId)) {
-        workout.exercises.set(weId, {
-          id: weId,
-          order: row.workout_exercises.order,
-          name: row.exercises?.name ?? "Unknown Exercise",
-          sets: [],
-        });
-      }
-      if (row.sets) {
-        workout.exercises.get(weId)!.sets.push({
-          id: row.sets.id,
-          setNumber: row.sets.setNumber,
-          reps: row.sets.reps,
-          weightKg: row.sets.weightKg,
-        });
-      }
-    }
-  }
-
-  const workoutsList = Array.from(workoutsMap.values()).map((w) => ({
-    ...w,
-    exercises: Array.from(w.exercises.values()),
-  }));
+  const formattedDate = format(date, "do MMM yyyy");
+  const workouts = MOCK_WORKOUTS;
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
@@ -98,32 +53,24 @@ export default async function DashboardPage({
 
       <div className="flex items-center gap-3 mb-8">
         <span className="text-sm text-muted-foreground">Date:</span>
-        <DatePicker defaultDate={dateStr} />
+        <DatePicker date={date} onDateChange={setDate} />
       </div>
 
-      {workoutsList.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No workouts logged for this date.</p>
+      {workouts.length === 0 ? (
+        <p className="text-muted-foreground text-sm">
+          No workouts logged for {formattedDate}.
+        </p>
       ) : (
         <div className="space-y-6">
-          {workoutsList.map((workout) => (
+          {workouts.map((workout) => (
             <div key={workout.id} className="border border-border rounded-lg p-5">
               <div className="flex items-start justify-between mb-4">
-                <h2 className="font-semibold text-lg">
-                  {workout.name ?? "Workout"}
-                </h2>
-                {workout.startedAt && (
-                  <span className="text-xs text-muted-foreground">
-                    {workout.startedAt.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                    {workout.finishedAt &&
-                      ` – ${workout.finishedAt.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}`}
-                  </span>
-                )}
+                <h2 className="font-semibold text-lg">{workout.name}</h2>
+                <span className="text-xs text-muted-foreground">
+                  {format(workout.startedAt, "h:mm a")}
+                  {workout.finishedAt &&
+                    ` – ${format(workout.finishedAt, "h:mm a")}`}
+                </span>
               </div>
 
               {workout.exercises.length === 0 ? (
@@ -140,7 +87,7 @@ export default async function DashboardPage({
                           <thead>
                             <tr className="text-muted-foreground text-xs">
                               <th className="text-left font-medium pb-1 w-12">Set</th>
-                              <th className="text-left font-medium pb-1 w-20">Weight</th>
+                              <th className="text-left font-medium pb-1 w-24">Weight</th>
                               <th className="text-left font-medium pb-1">Reps</th>
                             </tr>
                           </thead>
