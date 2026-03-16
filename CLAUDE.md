@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Before generating any code, **always** read the relevant file(s) in the `/docs` directory first and strictly follow the standards defined there. The `/docs` directory is the source of truth for coding standards in this project.
 
 - /docs/ui.md
+- /docs/data-fetching.md
 
 ## Commands
 

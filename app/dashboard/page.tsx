@@ -1,51 +1,20 @@
-"use client";
-
-import { useState } from "react";
+import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
+import { getWorkoutsForDate } from "@/data/workouts";
 import DatePicker from "./date-picker";
 
-const MOCK_WORKOUTS = [
-  {
-    id: 1,
-    name: "Morning Push Session",
-    startedAt: new Date(2026, 2, 16, 7, 30),
-    finishedAt: new Date(2026, 2, 16, 8, 45),
-    exercises: [
-      {
-        id: 1,
-        name: "Bench Press",
-        sets: [
-          { id: 1, setNumber: 1, reps: 8, weightKg: "80" },
-          { id: 2, setNumber: 2, reps: 8, weightKg: "82.5" },
-          { id: 3, setNumber: 3, reps: 6, weightKg: "85" },
-        ],
-      },
-      {
-        id: 2,
-        name: "Overhead Press",
-        sets: [
-          { id: 4, setNumber: 1, reps: 10, weightKg: "50" },
-          { id: 5, setNumber: 2, reps: 10, weightKg: "50" },
-          { id: 6, setNumber: 3, reps: 8, weightKg: "52.5" },
-        ],
-      },
-      {
-        id: 3,
-        name: "Tricep Pushdown",
-        sets: [
-          { id: 7, setNumber: 1, reps: 12, weightKg: "30" },
-          { id: 8, setNumber: 2, reps: 12, weightKg: "30" },
-        ],
-      },
-    ],
-  },
-];
+interface Props {
+  searchParams: Promise<{ date?: string }>;
+}
 
-export default function DashboardPage() {
-  const [date, setDate] = useState(new Date(2026, 2, 16));
+export default async function DashboardPage({ searchParams }: Props) {
+  const { date: dateParam } = await searchParams;
+  const date = dateParam ? new Date(dateParam) : new Date();
+
+  const { userId } = await auth();
+  const workouts = await getWorkoutsForDate(userId!, date);
 
   const formattedDate = format(date, "do MMM yyyy");
-  const workouts = MOCK_WORKOUTS;
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
@@ -53,7 +22,7 @@ export default function DashboardPage() {
 
       <div className="flex items-center gap-3 mb-8">
         <span className="text-sm text-muted-foreground">Date:</span>
-        <DatePicker date={date} onDateChange={setDate} />
+        <DatePicker date={date} />
       </div>
 
       {workouts.length === 0 ? (
@@ -67,7 +36,7 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between mb-4">
                 <h2 className="font-semibold text-lg">{workout.name}</h2>
                 <span className="text-xs text-muted-foreground">
-                  {format(workout.startedAt, "h:mm a")}
+                  {workout.startedAt && format(workout.startedAt, "h:mm a")}
                   {workout.finishedAt &&
                     ` – ${format(workout.finishedAt, "h:mm a")}`}
                 </span>

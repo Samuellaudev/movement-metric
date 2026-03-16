@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -13,11 +14,20 @@ import {
 
 interface DatePickerProps {
   date: Date;
-  onDateChange: (date: Date) => void;
 }
 
-export default function DatePicker({ date, onDateChange }: DatePickerProps) {
+export default function DatePicker({ date }: DatePickerProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  function handleSelect(d: Date | undefined) {
+    if (!d) return;
+    const params = new URLSearchParams();
+    params.set("date", format(d, "yyyy-MM-dd"));
+    router.push(`${pathname}?${params.toString()}`);
+    setOpen(false);
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -31,12 +41,7 @@ export default function DatePicker({ date, onDateChange }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={(d) => {
-            if (d) {
-              onDateChange(d);
-              setOpen(false);
-            }
-          }}
+          onSelect={handleSelect}
         />
       </PopoverContent>
     </Popover>
