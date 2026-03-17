@@ -10,6 +10,7 @@ Before generating any code, **always** read the relevant file(s) in the `/docs` 
 - /docs/data-fetching.md
 - /docs/auth.md
 - /docs/data-mutations.md
+- /docs/routing.md
 
 ## Commands
 
