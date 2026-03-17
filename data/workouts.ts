@@ -6,6 +6,27 @@ export async function createWorkout(userId: string, name: string, startedAt: Dat
   return db.insert(workouts).values({ userId, name, startedAt }).returning();
 }
 
+export async function getWorkoutById(id: number, userId: string) {
+  const result = await db
+    .select()
+    .from(workouts)
+    .where(and(eq(workouts.id, id), eq(workouts.userId, userId)))
+    .limit(1);
+  return result[0] ?? null;
+}
+
+export async function updateWorkout(
+  id: number,
+  userId: string,
+  data: { name: string; startedAt: Date }
+) {
+  return db
+    .update(workouts)
+    .set({ name: data.name, startedAt: data.startedAt })
+    .where(and(eq(workouts.id, id), eq(workouts.userId, userId)))
+    .returning();
+}
+
 export async function getWorkoutsForDate(userId: string, date: Date) {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
