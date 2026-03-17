@@ -119,6 +119,31 @@ export async function createWorkoutAction(input: CreateWorkoutInput) {
 }
 ```
 
+## Redirects — Client Side Only
+
+**Do NOT call `redirect()` inside server actions. Redirects must be handled client-side after the server action resolves.**
+
+- Do NOT import or call `redirect()` from `next/navigation` inside a server action
+- Server actions should return a result (or void) and let the calling client component handle navigation
+
+```ts
+// ✅ Correct — redirect handled in the client component
+// app/workouts/new/actions.ts
+export async function createWorkoutAction(input: CreateWorkoutInput) {
+  // validate and mutate...
+}
+
+// app/workouts/new/new-workout-form.tsx
+const result = await createWorkoutAction(input);
+router.push("/dashboard");
+
+// ❌ Wrong — redirect inside the server action
+export async function createWorkoutAction(input: CreateWorkoutInput) {
+  // validate and mutate...
+  redirect("/dashboard");
+}
+```
+
 ## Data Isolation — Users May Only Mutate Their Own Data
 
 **Every mutation must be scoped to the authenticated user's ID.**
