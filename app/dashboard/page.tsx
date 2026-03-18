@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { getWorkoutsForDate } from "@/data/workouts";
 import DatePicker from "./date-picker";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   searchParams: Promise<{ date?: string }>;
@@ -24,6 +25,12 @@ export default async function DashboardPage({ searchParams }: Props) {
       <div className="flex items-center gap-3 mb-8">
         <span className="text-sm text-muted-foreground">Date:</span>
         <DatePicker date={date} />
+      </div>
+
+      <div className="mb-6">
+        <Button asChild>
+          <Link href="/dashboard/workout/new">Log New Workout</Link>
+        </Button>
       </div>
 
       {workouts.length === 0 ? (
