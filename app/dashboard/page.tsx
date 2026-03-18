@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { getWorkoutsForDate } from "@/data/workouts";
@@ -32,7 +33,7 @@ export default async function DashboardPage({ searchParams }: Props) {
       ) : (
         <div className="space-y-6">
           {workouts.map((workout) => (
-            <div key={workout.id} className="border border-border rounded-lg p-5">
+            <Link key={workout.id} href={`/dashboard/workout/${workout.id}`} className="block border border-border rounded-lg p-5 hover:bg-muted/50 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h2 className="font-semibold text-lg">{workout.name}</h2>
                 <span className="text-xs text-muted-foreground">
@@ -77,7 +78,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   ))}
                 </div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}
