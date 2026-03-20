@@ -42,3 +42,9 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Claude local config
+.claude/settings.local.json
+
+# Claude runtime memory (optional but recommended)
+.claude/agent-memory/
