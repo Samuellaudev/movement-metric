@@ -36,8 +36,8 @@ export default async function EditWorkoutPage({ params }: Props) {
           <Link href="/dashboard">Back to Dashboard</Link>
         </Button>
       </div>
-      <EditWorkoutForm workout={workout} />
-      <WorkoutLog workout={workout} allExercises={allExercises} />
+      <EditWorkoutForm workout={ workout } />
+      <WorkoutLog workout={ workout } allExercises={ allExercises } />
     </div>
   );
 }
