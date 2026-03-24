@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -234,31 +234,29 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
           </Popover>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="startTime">Start Time</Label>
             <div className="relative">
-              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white pointer-events-none" />
               <Input
                 id="startTime"
                 type="time"
                 value={ startTime }
                 onChange={ (e) => setStartTime(e.target.value) }
                 required
-                className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden"
+                className="[&::-webkit-calendar-picker-indicator]:hidden"
               />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="finishTime">Finish Time</Label>
             <div className="relative">
-              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white pointer-events-none" />
               <Input
                 id="finishTime"
                 type="time"
                 value={ finishTime }
                 onChange={ (e) => setFinishTime(e.target.value) }
-                className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden"
+                className="[&::-webkit-calendar-picker-indicator]:hidden"
               />
             </div>
           </div>
