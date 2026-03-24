@@ -6,8 +6,8 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
@@ -204,8 +204,8 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
   if (!workoutId) {
     return (
       <form onSubmit={ handleCreate } className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="name">Workout Name</Label>
+        <Field>
+          <FieldLabel htmlFor="name">Workout Name</FieldLabel>
           <Input
             id="name"
             placeholder="e.g. Push Day"
@@ -213,10 +213,10 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
             onChange={ (e) => setName(e.target.value) }
             required
           />
-        </div>
+        </Field>
 
-        <div className="space-y-2">
-          <Label>Date</Label>
+        <Field>
+          <FieldLabel>Date</FieldLabel>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -232,35 +232,33 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
               />
             </PopoverContent>
           </Popover>
-        </div>
+        </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="startTime">Start Time</Label>
-            <div className="relative">
-              <Input
-                id="startTime"
-                type="time"
-                value={ startTime }
-                onChange={ (e) => setStartTime(e.target.value) }
-                required
-                className="[&::-webkit-calendar-picker-indicator]:hidden"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="finishTime">Finish Time</Label>
-            <div className="relative">
-              <Input
-                id="finishTime"
-                type="time"
-                value={ finishTime }
-                onChange={ (e) => setFinishTime(e.target.value) }
-                className="[&::-webkit-calendar-picker-indicator]:hidden"
-              />
-            </div>
-          </div>
-        </div>
+        <FieldGroup className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field>
+            <FieldLabel htmlFor="startTime">Start Time</FieldLabel>
+            <Input
+              id="startTime"
+              type="time"
+              step="1"
+              value={ startTime }
+              onChange={ (e) => setStartTime(e.target.value) }
+              required
+              className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="finishTime">Finish Time</FieldLabel>
+            <Input
+              id="finishTime"
+              type="time"
+              step="1"
+              value={ finishTime }
+              onChange={ (e) => setFinishTime(e.target.value) }
+              className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+            />
+          </Field>
+        </FieldGroup>
 
         { createError && <p className="text-sm text-destructive">{ createError }</p> }
 
@@ -335,8 +333,8 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
 
           { addingSetFor === exercise.workoutExerciseId ? (
             <div className="flex items-end gap-2 flex-wrap">
-              <div className="space-y-1">
-                <Label htmlFor={ `reps-${ exercise.workoutExerciseId }` }>Reps</Label>
+              <Field>
+                <FieldLabel htmlFor={ `reps-${ exercise.workoutExerciseId }` }>Reps</FieldLabel>
                 <Input
                   id={ `reps-${ exercise.workoutExerciseId }` }
                   type="number"
@@ -346,9 +344,9 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
                   onChange={ (e) => setSetReps(e.target.value) }
                   className="w-24"
                 />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor={ `weight-${ exercise.workoutExerciseId }` }>Weight (kg)</Label>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor={ `weight-${ exercise.workoutExerciseId }` }>Weight (kg)</FieldLabel>
                 <Input
                   id={ `weight-${ exercise.workoutExerciseId }` }
                   type="number"
@@ -359,7 +357,7 @@ export default function NewWorkoutForm({ allExercises, onSuccess, onCancel }: Pr
                   onChange={ (e) => setSetWeightKg(e.target.value) }
                   className="w-28"
                 />
-              </div>
+              </Field>
               <Button
                 size="sm"
                 disabled={ pending || !setReps || !setWeightKg }
