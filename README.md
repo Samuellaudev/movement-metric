@@ -1,6 +1,6 @@
 # Movement Metric
 
-A full-stack lifting diary app built as a portfolio project while learning [Claude Code](https://www.udemy.com/course/learn-claude-code/) — the AI-powered CLI for software development. Log workouts, track sets and volume, and visualize training progress over time.
+A full-stack lifting diary app built as a portfolio project while learning [Claude Code](https://claude.com/product/claude-code) — the AI-powered CLI for software development. Log workouts, track sets and volume, and visualize training progress over time.
 
 ![Next.js](https://img.shields.io/badge/Next.js_16-black?style=flat&logo=next.js) ![TypeScript](https://img.shields.io/badge/TypeScript_5-3178C6?style=flat&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=flat&logo=tailwindcss&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
 
