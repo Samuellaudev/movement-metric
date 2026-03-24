@@ -27,18 +27,18 @@ export default function NewWorkoutModal({ allExercises }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={ open } onOpenChange={ setOpen }>
       <DialogTrigger asChild>
-        <Button size="sm">Add Workout</Button>
+        <Button size="sm" className="cursor-pointer">Add Workout</Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Workout</DialogTitle>
         </DialogHeader>
         <NewWorkoutForm
-          allExercises={allExercises}
-          onSuccess={handleSuccess}
-          onCancel={() => setOpen(false)}
+          allExercises={ allExercises }
+          onSuccess={ handleSuccess }
+          onCancel={ () => setOpen(false) }
         />
       </DialogContent>
     </Dialog>

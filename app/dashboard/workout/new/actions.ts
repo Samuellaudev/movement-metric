@@ -13,6 +13,7 @@ import {
 const createWorkoutSchema = z.object({
   name: z.string().min(1, "Workout name is required"),
   startedAt: z.date(),
+  finishedAt: z.date().optional(),
 });
 
 type CreateWorkoutInput = z.infer<typeof createWorkoutSchema>;
@@ -29,7 +30,7 @@ export async function createWorkoutAction(input: CreateWorkoutInput) {
     return { error: "Not authenticated" };
   }
 
-  const [workout] = await createWorkout(userId, parsed.data.name, parsed.data.startedAt);
+  const [workout] = await createWorkout(userId, parsed.data.name, parsed.data.startedAt, parsed.data.finishedAt);
   return { workoutId: workout.id };
 }
 

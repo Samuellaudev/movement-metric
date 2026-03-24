@@ -4,6 +4,7 @@ import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import {
+  deleteWorkout,
   updateWorkout,
   addExerciseToWorkout,
   removeExerciseFromWorkout,
@@ -11,10 +12,17 @@ import {
   removeSet,
 } from "@/data/workouts";
 
+export async function deleteWorkoutAction(workoutId: number) {
+  const { userId } = await auth();
+  if (!userId) return { error: "Not authenticated" };
+  await deleteWorkout(workoutId, userId);
+}
+
 const updateWorkoutSchema = z.object({
   id: z.number().int().positive(),
   name: z.string().min(1, "Workout name is required"),
   startedAt: z.date(),
+  finishedAt: z.date().optional(),
 });
 
 type UpdateWorkoutInput = z.infer<typeof updateWorkoutSchema>;
@@ -34,6 +42,7 @@ export async function updateWorkoutAction(input: UpdateWorkoutInput) {
   await updateWorkout(parsed.data.id, userId, {
     name: parsed.data.name,
     startedAt: parsed.data.startedAt,
+    finishedAt: parsed.data.finishedAt,
   });
 }
 
@@ -57,7 +66,7 @@ export async function addExerciseToWorkoutAction(input: AddExerciseToWorkoutInpu
   }
 
   await addExerciseToWorkout(parsed.data.workoutId, parsed.data.exerciseId, userId);
-  revalidatePath(`/dashboard/workout/${parsed.data.workoutId}`);
+  revalidatePath(`/dashboard/workout/${ parsed.data.workoutId }`);
 }
 
 const removeExerciseFromWorkoutSchema = z.object({
@@ -80,7 +89,7 @@ export async function removeExerciseFromWorkoutAction(input: RemoveExerciseFromW
   }
 
   await removeExerciseFromWorkout(parsed.data.workoutExerciseId, parsed.data.workoutId, userId);
-  revalidatePath(`/dashboard/workout/${parsed.data.workoutId}`);
+  revalidatePath(`/dashboard/workout/${ parsed.data.workoutId }`);
 }
 
 const addSetSchema = z.object({
@@ -111,7 +120,7 @@ export async function addSetAction(input: AddSetInput) {
     parsed.data.reps,
     parsed.data.weightKg
   );
-  revalidatePath(`/dashboard/workout/${parsed.data.workoutId}`);
+  revalidatePath(`/dashboard/workout/${ parsed.data.workoutId }`);
 }
 
 const removeSetSchema = z.object({
@@ -134,5 +143,5 @@ export async function removeSetAction(input: RemoveSetInput) {
   }
 
   await removeSet(parsed.data.setId, parsed.data.workoutId, userId);
-  revalidatePath(`/dashboard/workout/${parsed.data.workoutId}`);
+  revalidatePath(`/dashboard/workout/${ parsed.data.workoutId }`);
 }
